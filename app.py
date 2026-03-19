@@ -73,10 +73,14 @@ def calculate_inflation_regret(initial_amount, start_year, end_year, inflation_r
     duration_factor = min(100, years * 3)
     inflation_factor = min(100, (inflation_rate * 100) * 8)
 
+    weighted_loss = 0.6 * loss_percent
+    weighted_duration = 0.25 * duration_factor
+    weighted_inflation = 0.15 * inflation_factor
+
     if initial_amount <= 0 or future_cost <= initial_amount:
         regret_score = 0
     else:
-        regret_score = (0.6 * loss_percent) + (0.25 * duration_factor) + (0.15 * inflation_factor)
+        regret_score = weighted_loss + weighted_duration + weighted_inflation
 
     regret_score = max(0, min(100, regret_score))
 
@@ -113,6 +117,26 @@ def calculate_inflation_regret(initial_amount, start_year, end_year, inflation_r
         "regret_score": regret_score,
         "insight": insight,
         "verdict": verdict,
+        "score_breakdown": {
+            "loss": {
+                "label": "Value lost over time",
+                "weight": 60,
+                "raw": loss_percent,
+                "contribution": weighted_loss,
+            },
+            "duration": {
+                "label": "How long inflation had to compound",
+                "weight": 25,
+                "raw": duration_factor,
+                "contribution": weighted_duration,
+            },
+            "inflation": {
+                "label": "Average inflation intensity",
+                "weight": 15,
+                "raw": inflation_factor,
+                "contribution": weighted_inflation,
+            },
+        },
     }
 
 @app.route("/", methods=["GET"])
@@ -139,32 +163,25 @@ def parse_payload(payload):
     except (ValueError, TypeError):
         end_year = start_year
 
-    manual_rate = payload.get("inflation_rate", "")
-
-    try:
-        manual_rate = float(str(manual_rate).strip()) if str(manual_rate).strip() != "" else None
-    except (ValueError, TypeError):
-        manual_rate = None
-
     if end_year < start_year:
         end_year = start_year
 
     if initial_amount < 0:
         initial_amount = 0.0
 
-    return description, initial_amount, start_year, end_year, manual_rate
+    return description, initial_amount, start_year, end_year
 
 
 def run_calculation(payload):
-    description, initial_amount, start_year, end_year, manual_rate = parse_payload(payload)
+    description, initial_amount, start_year, end_year = parse_payload(payload)
     api_rate_percent = fetch_average_inflation_rate(start_year, end_year)
 
     if api_rate_percent is not None:
         inflation_rate = api_rate_percent / 100.0
         inflation_source = "World Bank"
     else:
-        inflation_rate = (manual_rate / 100.0) if manual_rate is not None else 0.0
-        inflation_source = "Manual input"
+        inflation_rate = 0.0
+        inflation_source = "World Bank unavailable (used 0%)"
 
     result_data = calculate_inflation_regret(initial_amount, start_year, end_year, inflation_rate)
 
@@ -219,6 +236,26 @@ def calculate():
             "insight": data["insight"],
             "verdict": data["verdict"],
             "projection": data["projection"],
+            "score_breakdown": {
+                "loss": {
+                    "label": data["score_breakdown"]["loss"]["label"],
+                    "weight": data["score_breakdown"]["loss"]["weight"],
+                    "raw": round(data["score_breakdown"]["loss"]["raw"], 2),
+                    "contribution": round(data["score_breakdown"]["loss"]["contribution"], 2),
+                },
+                "duration": {
+                    "label": data["score_breakdown"]["duration"]["label"],
+                    "weight": data["score_breakdown"]["duration"]["weight"],
+                    "raw": round(data["score_breakdown"]["duration"]["raw"], 2),
+                    "contribution": round(data["score_breakdown"]["duration"]["contribution"], 2),
+                },
+                "inflation": {
+                    "label": data["score_breakdown"]["inflation"]["label"],
+                    "weight": data["score_breakdown"]["inflation"]["weight"],
+                    "raw": round(data["score_breakdown"]["inflation"]["raw"], 2),
+                    "contribution": round(data["score_breakdown"]["inflation"]["contribution"], 2),
+                },
+            },
         }
     )
 

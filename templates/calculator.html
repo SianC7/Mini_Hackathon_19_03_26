@@ -21,12 +21,13 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
+      font-size: 18px;
     }
 
     .container {
-      max-width: 920px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 30px;
     }
 
     .topbar {
@@ -40,9 +41,10 @@
       text-decoration: none;
       color: white;
       background: var(--green-primary);
-      padding: 10px 14px;
+      padding: 12px 18px;
       border-radius: 8px;
       font-weight: bold;
+      font-size: 18px;
     }
 
     .history-link:hover { background: var(--green-dark); }
@@ -51,51 +53,82 @@
       border: 1px solid var(--green-border);
       background: white;
       border-radius: 12px;
-      padding: 18px;
-      margin-bottom: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
       box-shadow: 0 4px 14px rgba(20, 83, 45, 0.08);
     }
 
     h1 {
       margin: 4px 0;
       color: var(--green-dark);
+      font-size: 42px;
     }
 
     p.subtitle {
       margin-top: 0;
       color: #355144;
+      font-size: 20px;
     }
 
     form {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      gap: 16px;
     }
 
     .full { grid-column: 1 / -1; }
     label {
       display: block;
       font-weight: bold;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       color: var(--green-dark);
+      font-size: 19px;
     }
 
-    input[type="number"], textarea {
-      width: 100%;
-      padding: 10px;
+    input[type="number"], input[type="text"] {
+      width: 50%;
+      max-width: 420px;
+      padding: 14px;
       border: 1px solid #cde8d2;
       border-radius: 8px;
       background: #fcfffd;
+      font-size: 19px;
+    }
+
+    .row-fields {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field-inline {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .field-inline label {
+      min-width: unset;
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .field-inline input[type="number"] {
+      width: 100%;
+      max-width: none;
     }
 
     button {
       border: none;
       border-radius: 8px;
-      padding: 11px 16px;
+      padding: 14px 22px;
       font-weight: bold;
       cursor: pointer;
       background: var(--green-primary);
       color: white;
+      font-size: 19px;
     }
 
     button:hover { background: var(--green-dark); }
@@ -103,25 +136,52 @@
     .result-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: 12px;
     }
 
     .metric {
       background: var(--green-soft);
       border: 1px solid var(--green-border);
       border-radius: 10px;
-      padding: 10px;
+      padding: 14px;
     }
 
-    .metric .label { font-size: 12px; color: var(--green-dark); font-weight: bold; }
-    .metric .value { font-size: 22px; font-weight: bold; margin-top: 4px; }
+    .metric .label { font-size: 16px; color: var(--green-dark); font-weight: bold; }
+    .metric .value { font-size: 32px; font-weight: bold; margin-top: 6px; }
 
     .insight {
-      margin-top: 10px;
+      margin-top: 12px;
       background: #f0fff4;
       border-left: 4px solid var(--green-primary);
-      padding: 10px;
+      padding: 14px;
       border-radius: 8px;
+      line-height: 1.5;
+    }
+
+    .breakdown {
+      margin-top: 12px;
+      background: #f8fff9;
+      border: 1px solid #d7f3dd;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .breakdown h3 {
+      margin: 0 0 8px 0;
+      color: var(--green-dark);
+      font-size: 24px;
+    }
+
+    .breakdown ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .graph-note {
+      margin-top: 8px;
+      color: #2f4f3f;
+      font-size: 16px;
     }
 
     .error {
@@ -138,6 +198,9 @@
 
     @media (max-width: 700px) {
       form, .result-grid { grid-template-columns: 1fr; }
+      .row-fields { grid-template-columns: 1fr; }
+      .field-inline { flex-direction: column; align-items: flex-start; }
+      .field-inline label { min-width: unset; margin-bottom: 6px; }
     }
   </style>
 </head>
@@ -155,27 +218,24 @@
       <form id="calculatorForm">
         <div class="full">
           <label for="description">Description of decision</label>
-          <textarea id="description" name="description" rows="2" required placeholder="Bought a car for R200000 in 2015"></textarea>
+          <input id="description" name="description" type="text" required placeholder="Bought a car for R200000 in 2015">
         </div>
 
-        <div>
-          <label for="initial_amount">Initial Amount (R)</label>
-          <input type="number" id="initial_amount" name="initial_amount" min="0" step="0.01" placeholder="1200" required>
-        </div>
+        <div class="row-fields">
+          <div class="field-inline">
+            <label for="initial_amount">Initial Amount (R)</label>
+            <input type="number" id="initial_amount" name="initial_amount" min="0" step="0.01" placeholder="1200" required>
+          </div>
 
-        <div>
-          <label for="start_year">Start Year</label>
-          <input type="number" id="start_year" name="start_year" min="1900" max="2100" value="{{ current_year - 5 }}" required>
-        </div>
+          <div class="field-inline">
+            <label for="start_year">Start Year</label>
+            <input type="number" id="start_year" name="start_year" min="1900" max="2100" value="{{ current_year - 5 }}" required>
+          </div>
 
-        <div>
-          <label for="end_year">End Year</label>
-          <input type="number" id="end_year" name="end_year" min="1900" max="2100" value="{{ current_year }}" required>
-        </div>
-
-        <div>
-          <label for="inflation_rate">Manual inflation fallback (%)</label>
-          <input type="number" id="inflation_rate" name="inflation_rate" min="0" step="0.01" placeholder="Used only if API has no data">
+          <div class="field-inline">
+            <label for="end_year">End Year</label>
+            <input type="number" id="end_year" name="end_year" min="1900" max="2100" value="{{ current_year }}" required>
+          </div>
         </div>
 
         <div class="full">
@@ -208,8 +268,18 @@
       <p style="margin: 12px 0 0 0;"><strong>Inflation rate used:</strong> <span id="usedInflationRate">-</span></p>
       <p style="margin: 4px 0 0 0;"><strong>Data source:</strong> <span id="usedSource">-</span></p>
       <div class="insight" id="insightText"></div>
+      <div class="breakdown">
+        <h3>How your regret score was calculated</h3>
+        <p style="margin: 0;">We combine three factors and cap the result at 100.</p>
+        <ul>
+          <li id="breakdownLoss">-</li>
+          <li id="breakdownDuration">-</li>
+          <li id="breakdownInflation">-</li>
+        </ul>
+      </div>
       <div style="margin-top: 14px;">
-        <canvas id="projectionChart" height="120"></canvas>
+        <canvas id="projectionChart" height="170"></canvas>
+        <p class="graph-note" id="graphNote">-</p>
       </div>
     </div>
   </div>
@@ -231,7 +301,6 @@
         initial_amount: form.initial_amount.value,
         start_year: form.start_year.value,
         end_year: form.end_year.value,
-        inflation_rate: form.inflation_rate.value,
       };
 
       try {
@@ -255,8 +324,14 @@
         document.getElementById("usedSource").textContent = data.inflation_source;
         document.getElementById("insightText").textContent = data.insight;
 
+        document.getElementById("breakdownLoss").textContent = `${data.score_breakdown.loss.label}: ${data.score_breakdown.loss.raw}% pressure × ${data.score_breakdown.loss.weight}% weight = ${data.score_breakdown.loss.contribution} points`;
+        document.getElementById("breakdownDuration").textContent = `${data.score_breakdown.duration.label}: ${data.score_breakdown.duration.raw}% pressure × ${data.score_breakdown.duration.weight}% weight = ${data.score_breakdown.duration.contribution} points`;
+        document.getElementById("breakdownInflation").textContent = `${data.score_breakdown.inflation.label}: ${data.score_breakdown.inflation.raw}% pressure × ${data.score_breakdown.inflation.weight}% weight = ${data.score_breakdown.inflation.contribution} points`;
+
         const labels = data.projection.map(item => item.year);
         const values = data.projection.map(item => item.value);
+
+        document.getElementById("graphNote").textContent = `This line shows how the amount grows each year from ${data.start_year} to ${data.end_year} under average inflation.`;
 
         if (chartInstance) {
           chartInstance.destroy();
@@ -277,11 +352,29 @@
           },
           options: {
             responsive: true,
-            plugins: { legend: { display: true } },
+            plugins: {
+              legend: { display: true },
+              title: {
+                display: true,
+                text: "Year-by-year inflation impact",
+                color: "#14532d",
+                font: { size: 18 }
+              }
+            },
             scales: {
               y: {
+                title: {
+                  display: true,
+                  text: "Amount in Rand (R)"
+                },
                 ticks: {
                   callback: (val) => `R${val}`
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: "Year"
                 }
               }
             }

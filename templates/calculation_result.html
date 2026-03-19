@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inflation Regret Results</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f7fff9; color: #1f2937; }
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f7fff9; color: #1f2937; font-size: 18px; }
     .container { max-width: 760px; margin: auto; }
-    .card { border: 1px solid #86efac; border-radius: 8px; padding: 20px; background: #ffffff; }
-    .result-line { margin: 8px 0; }
+    .card { border: 1px solid #86efac; border-radius: 8px; padding: 24px; background: #ffffff; }
+    .result-line { margin: 10px 0; }
     .label { font-weight: bold; color: #14532d; }
-    a.button { display: inline-block; margin-top: 14px; background: #16a34a; color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 4px; }
+    .breakdown { margin-top: 14px; background: #f8fff9; border: 1px solid #d7f3dd; border-radius: 8px; padding: 14px; }
+    .breakdown ul { margin: 8px 0 0 20px; line-height: 1.6; }
+    a.button { display: inline-block; margin-top: 14px; background: #16a34a; color: #fff; text-decoration: none; padding: 12px 18px; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -27,6 +29,14 @@
       <div class="result-line"><span class="label">Purchasing Power Loss:</span> R{{ purchasing_power_loss | round(2) }}</div>
       <div class="result-line"><span class="label">Regret Score:</span> {{ regret_score | round(2) }} / 100 ({{ verdict }})</div>
       <div class="result-line"><span class="label">Insight:</span> {{ insight }}</div>
+      <div class="breakdown">
+        <div class="label">How your regret score was calculated</div>
+        <ul>
+          <li>{{ score_breakdown.loss.label }}: {{ score_breakdown.loss.raw | round(2) }}% pressure × {{ score_breakdown.loss.weight }}% weight = {{ score_breakdown.loss.contribution | round(2) }} points</li>
+          <li>{{ score_breakdown.duration.label }}: {{ score_breakdown.duration.raw | round(2) }}% pressure × {{ score_breakdown.duration.weight }}% weight = {{ score_breakdown.duration.contribution | round(2) }} points</li>
+          <li>{{ score_breakdown.inflation.label }}: {{ score_breakdown.inflation.raw | round(2) }}% pressure × {{ score_breakdown.inflation.weight }}% weight = {{ score_breakdown.inflation.contribution | round(2) }} points</li>
+        </ul>
+      </div>
     </div>
     <a class="button" href="{{ url_for('home') }}">Back to calculator</a>
   </div>
