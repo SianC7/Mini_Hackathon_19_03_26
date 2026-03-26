@@ -71,5 +71,3 @@ Most financial decisions feel small in the moment — a coffee, a subscription, 
 * Building **end-to-end data products**
 * Working in **team-based Git environments**
 * Turning abstract concepts into **user-facing tools**
-
----
